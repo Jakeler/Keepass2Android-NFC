@@ -4,7 +4,6 @@ package com.jan.kp2a_nfc;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
@@ -15,7 +14,6 @@ import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -25,14 +23,12 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.tozny.crypto.android.AesCbcWithIntegrity;
-
 import java.io.IOException;
 
 public class CreatePwdTag extends AppCompatActivity {
 
-    AesCbcWithIntegrity.SecretKeys keys;
-    byte[] keyData;  WriteNfcDialog dialog;
+    WriteNfcDialog dialog;
+    NdefRecord mimeRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,34 +96,27 @@ public class CreatePwdTag extends AppCompatActivity {
         EditText path = (EditText) findViewById(R.id.editDbPath);
         EditText pwd = (EditText) findViewById(R.id.editPwd);
         RadioGroup radio = (RadioGroup) findViewById(R.id.radio);
-        String pwdString = pwd.getText().toString();
 
-        keys = AesCbcWithIntegrity.generateKey();
-        keyData = keys.getConfidentialityKey().getEncoded();
-        byte[] keySha = keys.getIntegrityKey().getEncoded();
-        AesCbcWithIntegrity.CipherTextIvMac cipherText = AesCbcWithIntegrity.encrypt(pwdString, keys);
-        String pwdEncrypted = cipherText.toString();
+        NfcData nfcData = new NfcData();
+        nfcData.generateKeys();
 
-
-        SharedPreferences sharedPref = getSharedPreferences("main", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("instant", chk.isChecked());
-        editor.putString("path", path.getText().toString());
+        nfcData.dbPath = path.getText().toString();
+        nfcData.instantUnlock = chk.isChecked();
+        nfcData.plainPwd = pwd.getText().toString();
+        nfcData.encrypt();
 
         radio.getCheckedRadioButtonId();
         switch (radio.getCheckedRadioButtonId()) {
             case R.id.kp2a:
-                editor.putString("package", getString(R.string.kp2a));
+                nfcData.packageName = getString(R.string.kp2a);
                 break;
             case R.id.kp2a_nonet:
-                editor.putString("package", getString(R.string.kp2a_nonet));
+                nfcData.packageName = getString(R.string.kp2a_nonet);
                 break;
         }
 
-        editor.putString("keySha", Base64.encodeToString(keySha, Base64.NO_WRAP));
-        editor.putString("pwdEncrypted", pwdEncrypted);
-        editor.commit();
-
+        nfcData.saveSettings(getSharedPreferences("main", Context.MODE_PRIVATE));
+        mimeRecord = nfcData.getNdefRecord();
 
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -166,7 +155,6 @@ public class CreatePwdTag extends AppCompatActivity {
     public void onNewIntent(Intent intent) {
         Log.d("NFC", "Intent!");
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        NdefRecord mimeRecord = NdefRecord.createMime("application/com.jan.kp2a_nfc", keyData);
         writeNfc(mimeRecord, tag);
     }
 

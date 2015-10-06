@@ -29,22 +29,17 @@ public class NfcActivity extends Activity {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPref = getSharedPreferences("main", Context.MODE_PRIVATE);
 
-        Intent intent = new Intent();
-        intent.setClassName(sharedPref.getString("package", null), "md5f0702f468598c68ce18586502249fb40.PasswordActivity");
-        intent.putExtra("fileName", sharedPref.getString("path", null));
-        //intent.putExtra("keyFile", "");
+        NfcData nfcData = new NfcData();
+        nfcData.loadSettings(sharedPref);
 
         Intent NfcIntent = getIntent();
         Tag tag = NfcIntent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Ndef ndef = Ndef.get(tag);
         NdefMessage ndefMessage = ndef.getCachedNdefMessage();
         NdefRecord[] records = ndefMessage.getRecords();
-        String plainPwd = decrypt(records[0].getPayload(), sharedPref.getString("keySha", null), sharedPref.getString("pwdEncrypted", null));
+        nfcData.decrypt(records[0].getPayload());
 
-        intent.putExtra("password", plainPwd);
-        intent.putExtra("launchImmediately", sharedPref.getBoolean("instant", false));
-
-        startActivity(intent);
+        startActivity(nfcData.getIntent());
         finish();
     }
 
