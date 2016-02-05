@@ -39,12 +39,14 @@ public class NfcActivity extends Activity {
         NdefRecord[] records = ndefMessage.getRecords();
         nfcData.decrypt(records[0].getPayload());
 
+        //TODO Toast if it fails
+
         startActivity(nfcData.getIntent());
         finish();
     }
 
 
-    private String decrypt(byte[] key, String shaText, String cipherText) {
+    private String decrypt_old(byte[] key, String shaText, String cipherText) {
 
         try {
             byte[] sha = Base64.decode(shaText, Base64.NO_WRAP);

@@ -40,10 +40,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void click(View v){
+    public void openCreatePwdTag(View v){
 
         startActivity(new Intent(this, CreatePwdTag.class));
 
+    }
+
+    public void openVerify(View v) {
+        startActivity(new Intent(this, VerifyActivity.class));
     }
 
 

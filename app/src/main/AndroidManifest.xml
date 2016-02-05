@@ -37,6 +37,10 @@
             android:name=".CreatePwdTag"
             android:label="@string/title_activity_create_pwd_tag" >
         </activity>
+        <activity
+            android:name=".VerifyActivity"
+            android:label="@string/title_activity_verify">
+        </activity>
     </application>
 
 </manifest>

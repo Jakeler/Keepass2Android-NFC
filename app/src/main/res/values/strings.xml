@@ -8,14 +8,18 @@
     <string name="title_activity_create_pwd_tag">Create password tag</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="path">Database file path:</string>
+    <string name="path">Database path:</string>
     <string name="pwd">Password:</string>
     <string name="instant">Unlock instantly</string>
     <string name="start_write">Write it!</string>
     <string name="empty_path">File path is empty!</string>
-    <string name="title_activity_write_nfc">WriteNfc</string>
     <string name="verify">Verify or copy</string>
-    <string name="keyfile">KeyFile (optional):</string>
+    <string name="keyfile">KeyFile (optional): </string>
     <string name="kp2a_nonet">keepass2android.keepass2android_nonet</string>
     <string name="kp2a">keepass2android.keepass2android</string>
+    <string name="title_activity_verify">Verify a tag</string>
+    <string name="searching">Searching for NFC tag...</string>
+    <string name="pwd_decrypted">Password decrypted</string>
+    <string name="kp2a_app">Keepass App:</string>
+    <string name="tag_found">NFC tag found: </string>
 </resources>
